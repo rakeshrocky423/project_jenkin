@@ -1,35 +1,46 @@
 pipeline {
     agent any
-    triggers {
-  cron 'H/5 * * * *'
-}
-
-    tools{
-        maven 'maven-3.8.6'
+    tools {
+        maven 'Maven3'
     }
-    options {
-  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '2')
-}
-
 
     stages {
-        stage('Clone the repository') {
+        stage('Git checkout') {
             steps {
-               git credentialsId: 'Github_username_password', url: 'https://github.com/techworldwithmurali/Build-and-Push-to-artifactory.git'
+                git changelog: false, credentialsId: 'git_username_password', poll: false, url: 'https://github.com/ArshiyaBegum1/project_jenkin.git'
             }
         }
-
-
-        stage('Build the maven code') {
+        stage('Build') {
             steps {
-            sh 'mvn clean install'
-                 }
-    }
-
-stage('Deploy to tomcat') {
+                sh 'mvn clean package'
+            }
+            post {
+                success {
+                    
+                    slackSend (
+                        color: '#36a64f', // Green color for success
+                        message: 'Build successful! :tada:',
+                    )
+                }
+            }
+        
+        }
+        stage('Deploy') {
             steps {
-            deploy adapters: [tomcat7(credentialsId: 'Tomcat_Username_password', path: '', url: 'http://15.207.117.35:8080')], contextPath: null, war: '**/*.war'
-                 }
+                deploy adapters: [tomcat9(credentialsId: 'tomcat_newusername_password', path: '', url: 'http://3.85.1.31:8080')], contextPath: null, war: '**/*.war'
+            }
+            post {
+                success {
+                    
+                    // Send Slack notification
+                    slackSend (
+                        color: '#36a64f', // Green color for success
+                        message: 'Deployment successful! :tada:',
+                    )
+                }
+            }
+        }
+        
     }
 }
-}
+
