@@ -1,6 +1,6 @@
-
-  pipeline {
+pipeline {
     agent any
+    
     tools {
         maven 'Maven3'
     }
@@ -8,38 +8,35 @@
     stages {
         stage('Git checkout') {
             steps {
-               git changelog: false, credentialsId: 'user_name_password_git', poll: false, url: 'https://github.com/rakeshrocky423/project_jenkin.git'
+                git changelog: false, credentialsId: 'user_name_password_git', poll: false, url: 'https://github.com/rakeshrocky423/project_jenkin.git'
             }
         }
+        
         stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
-        stage('Build Docker Image'){
+        
+        stage('Build Docker Image') {
             steps {
                 sh 'docker build -t rocky07/my-app:2.0.0 .'
             }
-            
         }
-        stage('Push Docker Image'){
-            steps{
-              withCredentials([usernamePassword(credentialsId: 'username-password-docker', passwordVariable: 'rH704790@r', usernameVariable: 'rocky751')]) {
-    
-}  {
-   
-                  sh "docker login -u rocky751 -p ${dockerHubPwd}"
-               }
-            sh 'docker push rocky07/my-app:2.0.0'
-            }
-           
-        }
-        stage('Deploy'){
+        
+        stage('Push Docker Image') {
             steps {
-                sh 'docker run -p 8080:8080 -d --name my-app /my-app:2.0.0'
+                withCredentials([usernamePassword(credentialsId: 'username-password-docker', usernameVariable: 'rocky751', passwordVariable: 'rH704790@r')]) {
+                    sh "docker login -u ${rocky751} -p ${rH704790@r}"
+                    sh 'docker push rocky07/my-app:2.0.0'
+                }
             }
-            
         }
-   }
-   
-}   
+        
+        stage('Deploy') {
+            steps {
+                sh 'docker run -p 8080:8080 -d --name my-app rocky07/my-app:2.0.0'
+            }
+        }
+    }
+}
