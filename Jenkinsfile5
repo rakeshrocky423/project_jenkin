@@ -18,19 +18,14 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build('rocky07/my-app:2.0.0')
-                }
+                sh 'docker build -t rocky07/my-app:2.0.0 .'
             }
         }
         stage('Push Docker Image') {
             steps {
-                script {
-                    withCredentials([string(credentialsId: 'docker', variable: 'dockerHubPwd')]) {
-                        docker.withRegistry('', 'docker') {
-                            docker.image('rocky07/my-app:2.0.0').push()
-                        }
-                    }
+                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
+                    sh "docker login -u rocky751 -p ${dockerHubPwd}"
+                    sh 'docker push rocky07/my-app:2.0.0'
                 }
             }
         }
