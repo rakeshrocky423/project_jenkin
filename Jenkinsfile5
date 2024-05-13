@@ -21,19 +21,20 @@ pipeline {
                 sh 'docker build -t rocky07/my-app:2.0.0 .'
             }
         }
-        stage('Push Docker Image') {
-            steps {
-                // Tag the image with another tag
-                sh "docker tag rocky07/my-app:2.0.0 myregistry.com/my-app:latest"
-                
-                // Push the image with both tags
-                withCredentials([usernamePassword(credentialsId: 'username-password-docker', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
-                    sh "docker login -u ${dockerHubUsername} -p ${dockerHubPwd}"
-                    sh 'docker push rocky07/my-app:2.0.0'
-                    sh 'docker push myregistry.com/my-app:latest'
-                }
-            }
+       stage('Push Docker Image') {
+    steps {
+        // Tag the image with another tag
+        sh "docker tag rocky07/my-app:2.0.0 myregistry.com/my-app:latest"
+        
+        // Push the image with both tags
+        withCredentials([usernamePassword(credentialsId: 'username-password-docker', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
+            sh "docker login -u ${dockerHubUsername} -p ${dockerHubPwd}"
+            sh 'docker push rocky07/my-app:2.0.0'
+            sh 'docker push https://hub.docker.com/u/rocky751/my-app:latest'
         }
+    }
+}
+
         stage('Deploy') {
             steps {
                 sh 'docker run -p 8080:8080 -d --name my-app rocky07/my-app:2.0.0'
