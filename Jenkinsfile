@@ -1,28 +1,28 @@
 pipeline {
     agent any
     tools {
-        maven 'Maven3'
+        maven 'Mvane'
     }
-
+        
     stages {
-        stage('Git checkout') {
-            steps {
-                git changelog: false, credentialsId: 'git_username_password', poll: false, url: 'https://github.com/ArshiyaBegum1/project_jenkin.git'
-            }
-        }
-        stage('Build') {
+        stage ('build') {
             steps {
                 sh 'mvn clean package'
+            }    
+            post {
+                success {
+                    echo "archiving the artifacts"
+                    archiveArtifacts artifacts '**/target/8.war'
+                }
             }
-            
+
         }
-        stage('Deploy') {
+        stage ('deploy to tomcat server') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'tomcat_newusername_password', path: '', url: 'http://3.85.1.31:8080')], contextPath: null, war: '**/*.war'
-            }
+                deploy adapters: [tomcat9(credentialsId: 'username_password_tomcat', path: '', url: 'http://15.206.124.235:8070/')], contextPath: null, war: '**/*.war'
             
         }
-        
     }
-}
+    
+}   
 
