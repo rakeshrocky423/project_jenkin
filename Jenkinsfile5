@@ -30,7 +30,7 @@ pipeline {
                 sh "docker tag rocky07/my-app:2.0.0 myregistry.com/my-app:latest"
                 
                 // Push the image with both tags
-                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
+                withCredentials([usernamePassword(credentialsId: 'username-password-docker', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
                     maskPasswords('${dockerHubPwd}') {
                         sh "docker login -u ${dockerHubUsername} -p ${dockerHubPwd}"
                         sh 'docker push rocky07/my-app:2.0.0'
