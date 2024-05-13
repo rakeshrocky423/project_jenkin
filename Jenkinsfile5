@@ -30,7 +30,55 @@ pipeline {
                 sh "docker tag rocky07/my-app:2.0.0 myregistry.com/my-app:latest"
                 
                 // Push the image with both tags
-                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
+                withCredentials([usernamePassword(credentialsId: 'pipeline {
+    agent any
+    
+    tools {
+        maven 'Maven3'
+    }
+    
+    stages {
+        stage('Git checkout') {
+            steps {
+                git changelog: false, credentialsId: 'user_name_password_git', poll: false, url: 'https://github.com/rakeshrocky423/project_jenkin.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t rocky07/my-app:2.0.0 .'
+            }
+        }
+        
+        stage('Push Docker Image') {
+            steps {
+                // Tag the image with another tag
+                sh "docker tag rocky07/my-app:2.0.0 myregistry.com/my-app:latest"
+                
+                // Push the image with both tags
+                withCredentials([usernamePassword(credentialsId: 'username-password-docker', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
+                    maskPasswords('${dockerHubPwd}') {
+                        sh "docker login -u ${dockerHubUsername} -p ${dockerHubPwd}"
+                        sh 'docker push rocky07/my-app:2.0.0'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'docker run -p 8080:8080 -d --name my-app rocky07/my-app:2.0.0'
+            }
+        }
+    }
+}
+', usernameVariable: 'dockerHubUsername', passwordVariable: 'dockerHubPwd')]) {
                     maskPasswords('${dockerHubPwd}') {
                         sh "docker login -u ${dockerHubUsername} -p ${dockerHubPwd}"
                         sh 'docker push rocky07/my-app:2.0.0'
