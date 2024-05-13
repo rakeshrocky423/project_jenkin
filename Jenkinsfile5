@@ -23,8 +23,8 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'docker', variable: 'dockerHubPwd')]) {
-                    sh "docker login -u rocky751 -p ${dockerHubPwd}"
+                withCredentials([usernamePassword(credentialsId: 'username-password-docker', passwordVariable: 'rH704790@r', usernameVariable: 'rocky751')]) {
+                    sh "docker login -u ${rocky751} -p ${rH704790@r}"
                     sh 'docker push rocky07/my-app:2.0.0'
                 }
             }
