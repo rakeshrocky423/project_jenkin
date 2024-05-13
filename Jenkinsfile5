@@ -13,7 +13,7 @@
         }
         stage('Build') {
             steps {
-                sh 'echo "mvn clean package"'
+                sh 'mvn clean package'
             }
         }
         stage('Build Docker Image'){
@@ -24,7 +24,8 @@
         }
         stage('Push Docker Image'){
             steps{
-               withCredentials([string(credentialsId: 'docker-pwd', variable: 'dockerHubPwd')]) {
+               withCredentials([string(credentialsId: 'docker', variable: 'dockerHubPwd')]) {
+   
                   sh "docker login -u rocky751 -p ${dockerHubPwd}"
                }
             sh 'docker push rocky07/my-app:2.0.0'
@@ -33,7 +34,7 @@
         }
         stage('Deploy'){
             steps {
-                sh 'docker run -p 8080:8080 -d --name my-app rocky07/my-app:2.0.0'
+                sh 'docker run -p 8080:8080 -d --name my-app /my-app:2.0.0'
             }
             
         }
