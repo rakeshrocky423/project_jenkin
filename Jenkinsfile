@@ -17,7 +17,7 @@ pipeline {
         stage('Archive') {
             steps {
                 // Archive the built artifact
-                archiveArtifacts '**/target/9.war'
+                archiveArtifacts '**/target/*.war'
             }
         }
         
